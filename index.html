@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Contacts</title>
+</head>
+<body onload="fetchContacts()">
+  <!--When the page loads, it automatically calls the fetchContacts() function to display contacts.-->
+
+  <link rel="stylesheet" href="style.css">
+
+
+  <div class="table">Contacts loading...</div>
+  <!--This is where the contact list will be dynamically added using JavaScript.-->
+ 
+  <button class="refresh" type="button">Refresh</button>
+  <button class="addContact" type="button">Add Contact</button>
+
+  <script src="config.js"></script>
+  <!--Loads the external JavaScript file config.js, which likely defines rootPath and apiKey.-->
+
+  <script>
+    // Correctly get elements by class name (returns collection), access [0]
+    document.getElementsByClassName("refresh")[0].addEventListener('click', fetchContacts);
+    document.getElementsByClassName("addContact")[0].addEventListener('click', addContact);
+
+    function fetchContacts(){
+      fetch(rootPath + "controller/get-contacts/")
+      //It sends a GET request to a web server (an API) to fetch contact data.
+      //✅ fetch(...)This is a built-in JavaScript function.
+      // It is used to talk to servers and get or send data (usually with APIs).
+      // It returns a Promise (something that will return a result later).
+        
+      .then(function (response) {
+         
+        //This is saying:
+        // ➜ “When the server responds, do this next…”
+        // response is the raw reply from the server.
+        // It's not readable yet — like a sealed letter.
+
+         return response.json();  
+        })
+        //This opens the response and translates it into JavaScript data (like an object or array).
+        // It tells the browser:
+        // ➜ “Turn this text into something I can work with in JavaScript.”
+
+        .then(function (data) {
+          //This says: “After the previous action is done (like getting and parsing the data), do the following…”
+         //in (function (data) { ... })this defines what to do with the result from before — here, that result is called data.data is the contact info you received from the server, now ready to be used.
+        
+         displayOutput(data);
+        })
+        //This calls a function named displayOutput, and gives it the data.The job of displayOutput is to show the contacts on your web page.
+        
+        .catch(function(error) {
+          //This part runs only if something goes wrong with the previous fetch operation (like no internet or server error).
+
+          document.getElementsByClassName("table")[0].innerText = "Failed to load contacts.";
+         //It finds the first HTML element with class "table" and changes its text to show an error message:
+         //“Failed to load contacts.” — so the user knows something went wrong
+          
+         console.error("Fetch error:", error);
+         //It also writes the actual error details to the browser’s developer console (for debugging). This helps the developer see what exactly failed.
+
+        });
+    }
+
+    function displayOutput(data) {
+      let output = "<table>";
+
+      for (let a in data) {
+        
+        output += `
+          <tr onclick="editContact(${data[a].id})">
+            <td><img src="${rootPath}controller/uploads/${data[a].avatar}" alt="Avatar" style="width:50px;height:50px;"/></td>
+            <td><h5>${data[a].firstname}</h5></td>
+            <td><h5>${data[a].lastname}</h5></td>
+          </tr>
+        `;
+      }
+
+      output += "</table>";
+      document.getElementsByClassName("table")[0].innerHTML = output;
+    }
+
+    function addContact(){
+      //This defines a function named addContact.
+      // A function is like a little machine that does something when you “call” or run it.
+      // In this case, addContact is the name you use to run this machine.
+
+      window.open("add contact.html", "_self");
+      //This line is inside the function — it’s what the function actually does.
+      // window.open is a command that tells the browser to open a web page.
+      // The first part, "add contact.html", is the address (URL) of the page to open. Here, it means the file named "add contact.html".
+      // The second part, "_self", means open that page in the current browser tab or window (not a new tab or window).
+    }
+
+    function editContact(id){
+      //This defines a function named editContact.
+      // It takes one input called id — this is a number or string that identifies which contact you want to edit.
+      
+      window.open("edit contact.html?id=" + id, "_self");
+      //This tells the browser to open a page called "edit contact.html".
+      // It adds "?id=" + id to the URL — this means it sends the contact’s id as extra information in the web address.
+      // For example, if id is 5, the page URL will be "edit contact.html?id=5".
+      // The "_self" means the page opens in the same browser tab (it replaces the current page).
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>API Key</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <link rel="stylesheet" href="style.css">
+
+    <div>Please enter a valid API key.</div>
+    <form>
+      <input type="email" class="apiKey" name="apiKey" />
+      <button class="submitApiKey">Submit</button>
+    </form>
+
+    <script>
+      let rootPath = "https://mysite.itvarsity.org/api/ContactBook/"; 
+      //This line creates a variable called rootPath.
+      // It stores the base URL (a web address) of your Contact Book API.
+      // You will use this root path to connect to your online database or server when adding, editing, or getting contacts.
+      
+      document.getElementsByClassName("submitApikey").addEventListener('click' , setApiKey),
+      //This says: "When that element is clicked, run the setApiKey function."
+
+
+      function setApiKey(e) {
+        //✅ This defines a function named setApiKey, and it takes e (the event) as an input.
+
+
+        e.preventDefault();
+        //🛑 This line stops the default action — usually, this would be a form submitting and refreshing the page. We don't want that to happen.
+
+
+       apiKey = document.getElementById("apiKey").value;
+       //🔑 This gets the value entered by the user into the input box with ID "apiKey" and stores it in a variable named apiKey.
+        
+       fetch(rootPath + "controller/api-key/?apiKey=" + apiKey)
+         //🌐 This sends a request to the server to check if the API key is valid.It goes to a link like:
+        
+         .then(function (response) {
+            return response.text();
+          })//📄 This takes the server’s response and turns it into plain text (so we can read and compare it).
+         
+          .then(function (data) {
+            if (data == "1") {
+              //✔️ If the server responds with "1", it means the API key is valid.
+
+
+              localStorage.setItem("apiKey", apiKey);
+              //💾 This saves the API key locally in the browser, so you don’t have to enter it again next time.
+
+
+              window.open("index.html", "_self");
+            } else {
+              alert(data + " Invalid API key entered!");
+              //❌ If the API key is not valid, it shows an alert message that says the key is invalid.
+
+
+            }
+          })
+      }
+      
+
+      //This function checks if the API key entered by the user is correct.
+      // If it is:
+      // It saves it for future use.
+      //Sends you to the main page.
+      // If it's wrong:
+      // It shows an error message.
+
+
+    </script>
+  </body>
+</html>

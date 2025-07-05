@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Contact</title>
+</head>
+<body>
+
+    <link rel="stylesheet" href="style.css">
+
+    <form class="editForm">
+        <label for="firstname"> Firstname</label>
+        <input type="text" name="firstname" class="firstname"><br>
+
+        <label for="lastname"> Lastname</label>
+        <input type="text" name="lastname" class="lastname"><br>
+
+        <label for="mobile"> Mobile</label>
+        <input type="text" name="mobile" class="mobile"><br>
+
+        <label for="email"> Email</label>
+        <input type="text" name="email" class="email"><br>
+
+        <label for="avatar"> Select a file</label><br>
+        <input type="file" name="avatar" class="avatar"><br>
+
+        <button type="submit" class="submitForm">Submit</button>
+    </form>
+
+    <br>
+    <button class="homeLink" type="button">Home</button>
+
+    <script src="config.js"></script>
+    <script>
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            //document.addEventListener('DOMContentLoaded', ...) means:
+            // “Run this code only after the whole webpage has finished loading.”
+           
+            const form = document.getElementsByClassName("editForm")[0];
+            const submitBtn = document.getElementsByClassName("submitForm")[0];
+            const homeBtn = document.getElementsByClassName("homeLink")[0];
+            //Why do we use this?
+            // We want to grab specific elements from the webpage so we can interact with them using JavaScript.
+            // For example, you might want to listen for clicks on the submit button, or submit the form programmatically, or react when the home button is clicked.
+            // By storing these elements in variables (form, submitBtn, homeBtn), you can later add event listeners or change their properties easily.
+
+
+
+            // Submit form on button click (not form submission, to avoid double calls)
+            form.addEventListener('submit', submitForm);
+            homeBtn.addEventListener('click', homeLink);
+            //When the form is submitted (like clicking a submit button inside the form), it runs the function submitForm.
+            // When the home button (homeBtn) is clicked, it runs the function homeLink.
+        });
+
+        function submitForm(e) {
+            //✅ This defines a function called submitForm, and e is the event object passed when the form is submitted.
+
+
+            e.preventDefault();
+            //🛑 Stops the form from refreshing the page (which normally happens when you submit a form).
+
+            const formData = new FormData(document.getElementsByClassName('editForm')[0]);
+           //📦 This creates a FormData object — it collects all the input values from the first form on the page with the class "editForm".
+           
+           formData.append('apiKey', apiKey);
+           //🔐 Adds an extra field called apiKey to the form data — this might be used for authentication or authorization on the server.
+
+            fetch(rootPath + 'controller/insert-contact/', {
+                //🌐 Sends the form data to a specific URL on your server (the insert-contact API).
+                // rootPath is likely a base URL like /my-app/ or something similar.
+                
+                method: 'POST',
+                //📤 It uses the POST method, meaning the data is being sent to the server (not fetched).
+
+
+                headers: {
+                    'Accept': 'application/json, */*'
+                },//📨 This tells the server: “I accept JSON responses or anything else.”
+
+
+                body: formData
+            })//📬 The body of the request is the formData we created — which includes the contact info and apiKey.
+           
+            .then(response => response.text())
+            //📄 Converts the response from the server into plain text.
+
+
+            .then(data => {
+                if (data === "1") {
+                    alert("Contact added.");
+                } else {
+                    alert(data);
+                }
+                homeLink();
+            })
+            //💬 After the server replies:
+            // If the response is "1", it shows an alert that the contact was added.
+            // Otherwise, it shows whatever the server sent (maybe an error message).
+            // Then it calls homeLink() — this likely takes the user back to the main page or contacts list.
+
+
+            .catch(error => {
+                alert("An error occurred: " + error);
+            });
+            //⚠️ If something goes wrong (like no internet or server error), it shows an alert with the error message.
+
+
+        }
+
+        function homeLink() {
+            window.open("index.html", "_self");
+        }
+        //This tells the browser to open the "index.html" page.
+        // The "_self" part means:
+        // 👉 Open it in the same tab, replacing the current page.
+    </script>
+</body>
+</html>
